@@ -42,10 +42,21 @@ app.post("/cadastropessoa", async(req, res)=>{
     const cep  = req.body.cep;
     const nascimento = req.body.nascimento
 
+    //ver se todos os campos estão preenchidos e se não tiver vai dar esse erro
+    if(nome == null || email == null || endereco == null || numero == null || cep == null || nascimento == null){
+        return res.status(400).json({error : "Preencha todos os campos"})
+    }
+
+    //teste mais importante da ac
+    const emailExiste = await Pessoa.findOne({email : email});
+    
+    if (emailExiste){
+        return res.status(401).json({error : "O e-mail cadastrado já existe!"})
+    }
 
     const pessoa = new Pessoa({
         nome : nome,
-        email : email,
+        email : email,  
         endereco : endereco,
         numero : numero,
         cep : cep,
@@ -63,11 +74,15 @@ app.post("/cadastropessoa", async(req, res)=>{
 
 });
 
+//rota para get cadastro
+app.get("/cadastropessoa", async(req, res)=>{
+    res.sendFile(__dirname +"/cadastropessoa.html");
+})
+
 
 app.get("/", async(req, res)=>{
     res.sendFile(__dirname +"/index.html");
 })
-
 
 //configurando a porta
 app.listen(port, ()=>{
